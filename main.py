@@ -9,50 +9,35 @@ from pprint import pprint
 
 
 def get_page_content(front_url):
-    # get the page text
-    page = requests.get(front_url)
-
-    return page
+    # get the page response
+    return requests.get(front_url)
 
 
-def html_code_availability(page):
-    "check avaialbility of html in metadata"
-    
-    metadata = page.headers
-
-    type = metadata["Content-Type"]
-    if "html" in type:
-        return True
-
-
+def get_html_content(url):
+    page = get_page_content(url)
+    return page.text
 
     
-def html_to_soup(page):
+def get_soup_object(url):
+    html = get_html_content(url)
     # create a beautiful soup object
-    soup = BeautifulSoup(page.text,"lxml")
-    print(type(soup))
+    soup = BeautifulSoup(html,"lxml")
     return soup
 
 
 
-def scrape_recipe_links(soup)-> list:
-    """scrape and parse all the recipe links from the main page and return a list of recipe links
-
-    Args:
-        front_url (str): url for the front page ( where the recipe links are listed)
-
-    Returns:
-        list: A list of all the recipe urls
-    """
+def get_recipe_links(base_url):
+    soup = get_soup_object(base_url)
 
     # abstract the links and store in a list
     recipe_links_element = soup.find_all("a")
     recipe_links = [links["href"] for links in recipe_links_element]
 
     # modify the links by concatenating the front link
-    modified_urls = [(front_url + url) for url in recipe_links]
+    modified_urls = [(base_url + url) for url in recipe_links]
 
     return modified_urls
+
 
 def scrape_recipe(recipe_urls:list) -> dict:
     """Scrape all the recipe information into a dictionary
@@ -182,9 +167,7 @@ def ingredients_found_in_user(ingr_codingnomads:list,ingr_user:list)-> tuple:
 
             if index_ingr != -1:
                 score += 1
-                print(f"Ingredient {ingredient} found")
 
-    print(f"score : {score}/{out_of}")
 
     return score
 
@@ -212,7 +195,7 @@ def fetch_match_ingredients(data:dict, user_ingredients:list):
 def scrape(front_url):
     """scrape information from the database"""
     front_url = "https://codingnomads.github.io/recipes/"
-    recipe_urls= scrape_recipe_links(front_url=front_url)
+    recipe_urls= get_recipe_links(front_url=front_url)
     data = scrape_recipe(recipe_urls)
     store_recipes(data)
 
@@ -248,10 +231,10 @@ def main():
 
     
 if __name__ == "__main__":
-    page = get_page_content("https://codingnomads.github.io/recipes/")
-    html_to_soup(page)
+    url = "https://codingnomads.github.io/recipes/"
+    soup = get_recipe_links(url)
+    print(type(soup))
 
-    print(type("string"))
     
 
 
