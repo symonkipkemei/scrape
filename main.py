@@ -13,20 +13,13 @@ def get_page_content(front_url):
     return requests.get(front_url)
 
 
-def get_html_content(url):
-    page = get_page_content(url)
-    return page.text
+def get_html_content(url:str) -> str:
+    return get_page_content(url).text
 
-    
-def get_soup_object(url):
-    html = get_html_content(url)
-    # create a beautiful soup object
-    soup = BeautifulSoup(html,"lxml")
-    return soup
+def get_soup_object(url:str):
+    return BeautifulSoup(get_html_content(url),"lxml")
 
-
-
-def get_recipe_links(base_url):
+def get_recipe_links(base_url:str):
     soup = get_soup_object(base_url)
 
     # abstract the links and store in a list

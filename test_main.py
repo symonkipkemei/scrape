@@ -8,13 +8,12 @@ class TestMain(unittest.TestCase):
     def setUp(self):
         self.BASE_URL = "https://codingnomads.github.io/recipes/"
         self.url = f"{self.BASE_URL}recipes/11-making-my-own-baguet.html"
-        
+        self.recipe = [" a book mangoes in", "mangoes ripe", "sugar has expired","tasty salt"]
 
     # request can establish a connection and recieve a valid request
 
     def test_get_page_content_returns_valid_response(self):
-        index_page = main.get_page_content(self.BASE_URL)
-        self.assertEqual(index_page.status_code,200)
+        self.assertEqual(main.get_page_content(self.BASE_URL).status_code,200)
 
     def test_get_html_content_returns_html_string(self):
         page = main.get_html_content(self.BASE_URL)
@@ -34,7 +33,7 @@ class TestMain(unittest.TestCase):
     #can identify links from all t
 
     def test_get_ingredients_found_in_user(self):
-        self.assertEqual(main.ingredients_found_in_user([" a book mangoes in", "mangoes ripe", "sugar has expired","tasty salt"],["salt","mangoes"]),2)
+        self.assertEqual(main.ingredients_found_in_user(self.recipe,["salt","mangoes"]),2)
 
 
 if __name__ == "__main__":
