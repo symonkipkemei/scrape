@@ -3,6 +3,22 @@ from bs4 import BeautifulSoup
 import json
 from pprint import pprint
 import rescrape
+import os
+import sqlalchemy as s
+
+# connecting to the database
+database_password = os.environ["PY_MYSQL"]
+database_name = "recipe"
+
+
+#get connections
+engine = s.create_engine(f"mysql+pymysql://root:{database_password}@localhost/{database_name}")
+connection = engine.connect()
+metadata = s.MetaData()
+
+
+#get the table
+table = s.Table("recipe",metadata,autoload=True,autoload_with=engine)
 
 def store_recipes(url):
 
@@ -12,86 +28,54 @@ def store_recipes(url):
     recipe_links = rescrape.get_links(soup)
 
     # store items in dict object
-    recipe_store = {}
+    recipe_store = []
 
-    for index,link in enumerate(recipe_links,1):
+    for link in recipe_links:
         base_url = "https://codingnomads.github.io/recipes/"
-        url = base_url + link
         
         #get recipe items 
-        recipe_id = index
+        recipe_url = url = base_url + link
         recipe_author = rescrape.get_author(url)
         recipe_title = rescrape.get_title(url)
         recipe_texts = rescrape.get_recipe(url)
-        recipe_texts = recipe_texts.split("\n")
+
+        #store them in the list object
+        data = {"recipe_url":recipe_url,"recipe_author":recipe_author,"recipe_texts":recipe_texts,"recipe_title":recipe_title}
+        recipe_store.append(data)
+
+        print(f"Data fetched from {recipe_url}>>>>>>>>")
+
+    
+    return recipe_store
 
 
+def insert_database(data:dict):
+
+    for index,file in enumerate(data,1):
+        #abstract the values to be inserted into database and map them into their respective column names and insert to database
+
+        insert = s.insert(table).values(
+            recipe_author = file["recipe_author"],
+            recipe_title = file["recipe_title"],
+            recipe_texts  = file["recipe_texts"],
+            recipe_url = file["recipe_url"]
+            )
         
-        recipe_store[recipe_id]= {"recipe_url":url,"recipe_author":{recipe_author},"recipe_title":{recipe_title},"recipe_text":str(recipe_texts)}
-
-        pprint(recipe_store)
-
-    # dict to json
-    with open("recipes.json","w") as f:
-        json.dump(recipe_store,f)
-
-
-
-
-
-
-
-
-
+        proxy = connection.execute(insert)
+        
+        print(f"File url: {index} inserted successfully")
 
 
 def main():
-    front_url = "https://codingnomads.github.io/recipes/"
-    print("Options\n**********************\n1. Collect recipe from the internet \n2. Search for similar recipes\n3. Quit\n**********************")
-    
-    while True:
-        try:
-            user_choice  = int(input("select: "))
+    pass
 
-            if  user_choice == 1:
-                scrape(front_url)
-            elif user_choice == 2:
-                search_recipes()
-            elif user_choice == 3:
-                break
-            else:
-                print("Option out of range")
-        
-        except TypeError:
-            print("Select using numbers")
-
-    
 if __name__ == "__main__":
     url = "https://codingnomads.github.io/recipes/"
-    store_recipes(url)
-    
+    data = store_recipes(url)
+    insert_database(data)
 
 
 
-
-    
-
-
-
-
-
-        
-        
-            
-
-    
 
 
     
-
-
-    
-
-   
-
-
