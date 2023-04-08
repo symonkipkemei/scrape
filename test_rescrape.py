@@ -6,7 +6,7 @@ class TestRescrape(unittest.TestCase):
 
     def setUp(self) -> None:
         self.BASE_URL = "https://codingnomads.github.io/recipes/"
-        self.sample_url = "https://codingnomads.github.io/recipes/recipes/0-i-m-working-on-movin.html"
+        self.sample_url = "https://codingnomads.github.io/recipes/recipes/5-mini-brownie-trifles.html"
 
     #get page
     def test_get_page(self):
@@ -32,12 +32,12 @@ class TestRescrape(unittest.TestCase):
 
     #get author
     def test_get_author(self):
-        self.assertEqual(rescrape.get_author(self.sample_url),"mrfish1991")
+        self.assertEqual(rescrape.get_author(self.sample_url),"reddituser246")
         self.assertNotEqual(len(rescrape.get_author(self.sample_url)), 0)
 
     #get title
     def test_get_title(self):
-        self.assertEqual(rescrape.get_title(self.sample_url),"Japanese Potato Curry, simple and delicious!")
+        self.assertEqual(rescrape.get_title(self.sample_url),"Mini brownie trifles")
 
     #get recipe text
     def test_get_recipe(self):
@@ -48,16 +48,3 @@ class TestRescrape(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
-
-
-
-
-
-
-
-
-#get title
-
-#get text
